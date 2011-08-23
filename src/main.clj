@@ -123,26 +123,41 @@
 (defn play-color [color pos board]
   (do-adjacent-for-stone color pos (put-color color board pos)))
 
-(defn ai-find-best-move [color board max-depth]
-  (defn population-size []
-
-    )
-  (let [moves (find-moves color board)
+(defn ai-find-best-move [color board points minmax-color minmaxf max-depth]
+  (defn switchf [f]
+    (if (= f min-key) max-key min-key))
+  (defn find-best-score [scores]
+    (when (seq scores) (reduce #(minmaxf last %1 %2) scores)))
+  (let [enemy-moves (find-moves (rival-color color) board)
+        moves (find-moves color board)
         bs (reduce merge (vec (map #(hash-map % (play-color color % board)) moves)))
-        scores (vec (map #(hash-map % (count (positions color (bs %)))) moves))]
-;        best-score (reduce #(if (> (%1 1) (%2 1)) %1 %2) scores)]
-;        best-score (if (empty? moves)  (apply max-key last scores)]
-    (println moves)
-    (println bs)
-    (println (reduce merge scores))
-    ;(println best-score)
-;    (println (zipmap moves bs))
-;    (println (map #(concat [%] (play-color color % board)) (find-moves color board)))
-    ;(println ((hash-map bs) [2 4]))
-    0
-;    (best 0)
-    ))
+        ;scores (reduce merge (vec (map #(hash-map % (count (positions color (bs %)))) moves)))
+        minmax-scores (reduce merge (vec (map #(hash-map % (+ points (count (positions minmax-color (bs %))))) moves)))
+        best-minmax-score (find-best-score minmax-scores)]
+    (cond
+      (and (empty? moves) (empty? enemy-moves))
+        (do (println "both are empty:" {[0 0] (+ points (count (positions minmax-color board)))}) {[0 0] (+ points (count (positions minmax-color board)))})
 
+      (empty? moves)
+        (ai-find-best-move (rival-color color) board points minmax-color (switchf minmaxf) (dec max-depth))
+
+      (<= max-depth 0)
+        (do (println color "hit" max-depth "with" best-minmax-score) best-minmax-score)
+
+      :else
+        (let [minmax-score (last best-minmax-score)
+              games-raw (map #(hash-map % (last (ai-find-best-move (rival-color color) (bs %) minmax-score minmax-color (switchf minmaxf) (dec max-depth)))) moves)
+              games (reduce merge (vec games-raw))
+              best-move (find-best-score games)
+              ]
+          (when (= max-depth 10) (println "games:" games))
+          (when (= max-depth 10) (println "best move:" best-move))
+          ;{[0 0] 0}
+          best-move
+            ))))
+
+(defn ai-play [color board]
+  (first (ai-find-best-move color board 0 color max-key 10)))
 
 ;(defn do-adjacent-for-stone [color pos board]
 ;  (loop [dirs directions, result-board board]
@@ -183,31 +198,37 @@
       :else (println " draw.")))
   )
 
-(defn user-input [color valid-moves]
+(defn user-input [color board]
   (print "$" color "goes to (row column, ex: 1 1) #> ")
   (flush)
-  (let [pos (vec (map #(Integer/parseInt %) (vec (.split #" " (read-line)))))]
+  (let [valid-moves (find-moves color board)
+        pos (vec (map #(Integer/parseInt %) (vec (.split #" " (read-line)))))]
     (if (valid-moves pos) pos
       (do
         (println "invalid move:" pos "," color "can go to:" valid-moves)
-        (recur color valid-moves)))))
+        (recur color board)))))
 
-(defn console-ui [board color]
+(defn console-ui [board color make-move]
   (let [all-moves (find-moves color board), all-moves-rival (find-moves (rival-color color) board)]
     (print-board board all-moves)
     (cond
       (and (empty? all-moves) (empty? all-moves-rival))
         (do (print-score board)(println "Game over."))
       (empty? all-moves)
-        (do (println color "has no moves, passing over to" (rival-color color)) (recur board (rival-color color)))
+        (do (println color "has no moves, passing over to" (rival-color color))
+          (recur board (rival-color color) make-move))
       :else
-      (do
-        (let [pos (user-input color all-moves)]
-          (println)
-          (recur (play-color color pos board) (rival-color color)))))))
+      (do (let [pos (make-move color board)]
+        (println)
+        (recur (play-color color pos board) (rival-color color) make-move))))))
 
+(defn make-user-user-moves [color board]
+  (({'white user-input, 'black user-input} color) color board))
 
-(console-ui (init-board 4) 'white)
+(defn make-ai-user-moves [color board]
+  (({'white ai-play, 'black user-input} color) color board))
+
+(console-ui (init-board 4) 'white make-ai-user-moves)
 
 ;(print-board (init-board 4) {})
 ;(ai-find-best-move 'white (init-board 4) 0)
