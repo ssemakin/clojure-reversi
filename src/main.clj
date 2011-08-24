@@ -123,35 +123,43 @@
 (defn play-color [color pos board]
   (do-adjacent-for-stone color pos (put-color color board pos)))
 
+
 (defn ai-find-best-move [color board points minmax-color minmaxf max-depth]
   (defn switchf [f]
     (if (= f min-key) max-key min-key))
-  (defn find-best-score [scores]
-    (when (seq scores) (reduce #(minmaxf last %1 %2) scores)))
+  (defn find-best-score [scores f]
+    ;(when (= max-depth 10) (println "finding best of:" scores))
+    ;(when (seq scores) (when (= [[3 4] 27] (reduce #(f last %1 %2) scores)) (println "depth:" max-depth "scores:" scores)))
+    (if (seq scores) (reduce #(f last %1 %2) scores) [[0 0] 0]))
   (let [enemy-moves (find-moves (rival-color color) board)
         moves (find-moves color board)
         bs (reduce merge (vec (map #(hash-map % (play-color color % board)) moves)))
         ;scores (reduce merge (vec (map #(hash-map % (count (positions color (bs %)))) moves)))
         minmax-scores (reduce merge (vec (map #(hash-map % (+ points (count (positions minmax-color (bs %))))) moves)))
-        best-minmax-score (find-best-score minmax-scores)]
+        best-minmax-score (find-best-score minmax-scores minmaxf)]
     (cond
       (and (empty? moves) (empty? enemy-moves))
-        (do (println "both are empty:" {[0 0] (+ points (count (positions minmax-color board)))}) {[0 0] (+ points (count (positions minmax-color board)))})
+        ;(do (print "+both are empty:" {[0 0] (+ points (count (positions minmax-color board)))} "+"))
+        [[0 0] (+ points (count (positions minmax-color board)))]
 
       (empty? moves)
         (ai-find-best-move (rival-color color) board points minmax-color (switchf minmaxf) (dec max-depth))
 
       (<= max-depth 0)
-        (do (println color "hit" max-depth "with" best-minmax-score) best-minmax-score)
+        ;(do (print "+" color "hit" max-depth "with" best-minmax-score "+"))
+        best-minmax-score
 
       :else
         (let [minmax-score (last best-minmax-score)
               games-raw (map #(hash-map % (last (ai-find-best-move (rival-color color) (bs %) minmax-score minmax-color (switchf minmaxf) (dec max-depth)))) moves)
+              ;testp (println "depth:" max-depth games-raw)
               games (reduce merge (vec games-raw))
-              best-move (find-best-score games)
+              best-move (find-best-score games minmaxf)
               ]
+          ;(when (= max-depth 10) (println "boo!" (find-best-score games minmaxf)))
+          ;(when (= max-depth 10) (println "best local:" minmax-score "local scores" minmax-scores))
           (when (= max-depth 10) (println "games:" games))
-          (when (= max-depth 10) (println "best move:" best-move))
+          (when (= max-depth 10) (println "best move:" best-move "min:"))
           ;{[0 0] 0}
           best-move
             ))))
