@@ -236,7 +236,11 @@
 (defn make-ai-user-moves [color board]
   (({'white ai-play, 'black user-input} color) color board))
 
-(console-ui (init-board 4) 'white make-ai-user-moves)
+(defn make-user-ai-moves [color board]
+  (({'white user-input, 'black ai-play} color) color board))
+
+(console-ui (init-board 4) 'white make-user-ai-moves)
+
 
 ;(print-board (init-board 4) {})
 ;(ai-find-best-move 'white (init-board 4) 0)
