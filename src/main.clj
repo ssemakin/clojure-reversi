@@ -62,16 +62,6 @@
 (def directions [north-dir north-east-dir east-dir south-east-dir
                  south-dir south-west-dir west-dir north-west-dir])
 
-
-
-;(defn capture-north [stone-pos color board captured]
-;  (cond
-;    (= (board stone-pos) color)
-;      (capture-north (north-dir stone-pos) color board (conj captured {stone-pos color}))
-;    (and (nil? (board stone-pos)) (valid-pos? stone-pos board))
-;      (conj captured {:capture-move stone-pos} )
-;    :else captured))
-
 (defn black? [board pos] (= (board pos) 'black))
 (defn white? [board pos] (= (board pos) 'white))
 (defn empty-cell? [board pos] (nil? (board pos)))
@@ -124,77 +114,39 @@
   (do-adjacent-for-stone color pos (put-color color board pos)))
 
 
-(defn ai-find-best-move [color board points minmax-color minmaxf max-depth]
-  (defn switchf [f]
-    (if (= f min-key) max-key min-key))
-  (defn find-best-score [scores f]
-    ;(when (= max-depth 10) (println "finding best of:" scores))
-    ;(when (seq scores) (when (= [[3 4] 27] (reduce #(f last %1 %2) scores)) (println "depth:" max-depth "scores:" scores)))
-    (if (seq scores) (reduce #(f last %1 %2) scores) [[0 0] 0]))
-  (let [enemy-moves (find-moves (rival-color color) board)
-        moves (find-moves color board)
-        bs (reduce merge (vec (map #(hash-map % (play-color color % board)) moves)))
-        ;scores (reduce merge (vec (map #(hash-map % (count (positions color (bs %)))) moves)))
-        minmax-scores (reduce merge (vec (map #(hash-map % (+ points (count (positions minmax-color (bs %))))) moves)))
-        best-minmax-score (find-best-score minmax-scores minmaxf)]
+(defn end-of-game? [moves rival-moves]
+  (and (empty? moves) (empty? rival-moves)))
+
+(defn evaluate-game [color board]
+  (count (positions color board)))
+
+(defn minimax [color board depth]
+  (let [moves (find-moves color board)
+        rival-moves (find-moves (rival-color color) board)
+        boards (map #(play-color color % board) moves)]
     (cond
-      (and (empty? moves) (empty? enemy-moves))
-        ;(do (print "+both are empty:" {[0 0] (+ points (count (positions minmax-color board)))} "+"))
-        [[0 0] (+ points (count (positions minmax-color board)))]
-
+      (or (<= depth 0) (end-of-game? moves rival-moves))
+        (evaluate-game color board)
       (empty? moves)
-        (ai-find-best-move (rival-color color) board points minmax-color (switchf minmaxf) (dec max-depth))
-
-      (<= max-depth 0)
-        ;(do (print "+" color "hit" max-depth "with" best-minmax-score "+"))
-        best-minmax-score
-
+        (- (minimax (rival-color color) board (dec depth)))
       :else
-        (let [minmax-score (last best-minmax-score)
-              games-raw (map #(hash-map % (last (ai-find-best-move (rival-color color) (bs %) minmax-score minmax-color (switchf minmaxf) (dec max-depth)))) moves)
-              ;testp (println "depth:" max-depth games-raw)
-              games (reduce merge (vec games-raw))
-              best-move (find-best-score games minmaxf)
-              ]
-          ;(when (= max-depth 10) (println "boo!" (find-best-score games minmaxf)))
-          ;(when (= max-depth 10) (println "best local:" minmax-score "local scores" minmax-scores))
-          (when (= max-depth 10) (println "games:" games))
-          (when (= max-depth 10) (println "best move:" best-move "min:"))
-          ;{[0 0] 0}
-          best-move
-            ))))
+        (reduce max (vec (map #(- (minimax (rival-color color) % (dec depth))) boards))))))
+
+(defn ai-find-best-move-dash [color board depth]
+  (defn find-best-score [scores]
+    (when (seq scores) (reduce #(max-key last %1 %2) scores)))
+  (let [moves (find-moves color board)
+        boards (reduce merge (vec (map #(hash-map % (play-color color % board)) moves)))
+        move-scores (->> (pmap #(hash-map % (- (minimax (rival-color color) (boards %) depth))) moves)
+                      (vec) (reduce merge))
+        best-score (find-best-score move-scores)]
+    (println "moves:" move-scores)
+    (println "best move:" best-score)
+    (first best-score)))
+
 
 (defn ai-play [color board]
-  (first (ai-find-best-move color board 0 color max-key 10)))
-
-;(defn do-adjacent-for-stone [color pos board]
-;  (loop [dirs directions, result-board board]
-;    (if (first dirs)
-;      (let [nfound (find-covering-stone-in-dir (first dirs) pos result-board)
-;            board-with-flipped (mput-color color result-board (nfound :captured))
-;            processed-board (do-adjacent color (nfound :captured) board-with-flipped)]
-;        (recur (rest dirs) processed-board))
-;      result-board)))
-
-
-;(defn play [board position color]
-;  (conj board {position 'black}))
-
-;(defn capture-dir [direction start-pos color board]
-;  (loop [s start-pos, captured {}]
-;    (let [next-pos (direction s)]
-;      (cond
-;        (= (board next-pos) color)
-;          (recur next-pos (conj captured {next-pos color}))
-;        (and (nil? (board next-pos)) (valid-pos? board next-pos) (= (board s) color))
-;          (conj captured {:capture-move next-pos})
-;        :else captured))))
-;
-;(defn capture [start-pos color board]
-;  (->> (mapcat #(capture-dir % start-pos color board) directions) (filter #(not-empty %))))
-
-;(defn find-moves [color board]
-;  (mapcat #(capture % (rival-color color) board) (positions color board)))
+  (ai-find-best-move-dash color board 6))
 
 (defn print-score [board]
   (let [whites (count (positions 'white board))
@@ -239,31 +191,4 @@
 (defn make-user-ai-moves [color board]
   (({'white user-input, 'black ai-play} color) color board))
 
-(console-ui (init-board 4) 'white make-user-ai-moves)
-
-
-;(print-board (init-board 4) {})
-;(ai-find-best-move 'white (init-board 4) 0)
-
-
-;(def b (-> (init-board 4) (put-black [2 2]) (put-white [1 2]) (put-white [4 2]) (put-white [2 4]) (put-black [3 3]) (put-black [3 4])))
-;(print-board b)
-;(println (find-covering-stone-in-dir north-dir [4 2] b))
-;(print-board (do-adjacent-for-stone 'white [4 2] b))
-
-
-;(println (init-board 4))
-;(println (positions 'white (init-board 4)))
-;(println ((init-board 4) :size))
-;(print-board (-> (init-board 4) (put-black [2 2]) (put-white [1 2]) (put-white [4 2])))
-;(println (find-covering-stone-in-dir north-dir [4 2] (-> (init-board 4) (put-black [2 2]) (put-white [1 2]) (put-white [4 2]))))
-;(println (north-dir [3 2]))
-;(println (capture east-dir [3 2] 'white (init-board 4) {}))
-;(println (capture [3 2] 'white (init-board 4)))
-;(println (find-moves 'black (init-board 4)))
-
-;(def tboard (-> (empty-board 4) (put-black [3 2]) (put-black [2 3]) (put-white [3 1]) (put-white [1 3])))
-;(print-board tboard)
-;(println (find-moves 'black tboard))
-;(println (find-move-in-dir north-dir [3 2] 'white (init-board 4)))
-;(println (find-move-in-dir east-dir [3 2] 'white (init-board 4)))
+(console-ui (init-board 8) 'white make-user-ai-moves)
