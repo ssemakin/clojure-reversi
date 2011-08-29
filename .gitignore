@@ -1,4 +1,6 @@
-clojure-reversi.iml
+*.ipr
+*.iws
+*.iml
 lib
 out
 .idea
