@@ -1,0 +1,29 @@
+
+
+
+29 Aug 2011
+===========
+
+Tried some simple tests with map and pmap used in the top level of the minimax.
+
+#1 plain map is used in ai-find-best-move, minimax depth = 3, board: 8 x 8
+
+white: 0 black: 55 / black wins.
+
+time per one move:
+                 [white stones]       [black stones]         [all stones]
+  average:           1.616 secs           1.970 secs           1.796 secs
+      max:           5.927 secs           7.769 secs           7.769 secs
+      min:          18.19 msecs           2.04 msecs           2.04 msecs
+
+
+#2 pmap is used in ai-find-best-move, minimax depth = 3, board: 8 x 8
+
+white: 0 black: 55 / black wins.
+
+time per one move:
+                 [white stones]       [black stones]         [all stones]
+  average:         894.24 msecs           1.076 secs         986.97 msecs
+      max:           3.082 secs           4.086 secs           4.086 secs
+      min:          17.15 msecs           1.93 msecs           1.93 msecs
+

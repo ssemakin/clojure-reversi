@@ -8,6 +8,7 @@
 (defn print-score [board]
   (let [whites (count (positions 'white board))
         blacks (count (positions 'black board))]
+    (println)
     (print "white:" whites "black:" blacks "/")
     (cond
       (> whites blacks) (println " white wins.")
