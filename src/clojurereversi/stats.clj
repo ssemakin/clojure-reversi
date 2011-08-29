@@ -1,12 +1,12 @@
 (ns clojurereversi.stats)
 
-(def empty-stats {'white [] 'black []})
+(def empty-stats {:white [] :black []})
 
 (defn add-duration [color duration data]
   (conj data {color (conj (data color) duration)}))
 
 (defn catdata [data]
-  (vec (concat (data 'white) (data 'black))))
+  (vec (concat (data :white) (data :black))))
 
 (defn average [data]
   (/ (double (apply + data)) (double (count data))))
@@ -46,16 +46,16 @@
   (println "time per one move:")
   (printf "%10s %20s %20s %20s\n" "" "[white stones]" "[black stones]" "[all stones]")
   (printf "%10s %20s %20s %20s\n" "average:"
-    (frmt (avg-of-stones 'white data))
-    (frmt (avg-of-stones 'black data))
+    (frmt (avg-of-stones :white data))
+    (frmt (avg-of-stones :black data))
     (frmt (avg-of-total data)))
   (printf "%10s %20s %20s %20s\n" "max:"
-    (frmt (max-of-stones 'white data))
-    (frmt (max-of-stones 'black data))
+    (frmt (max-of-stones :white data))
+    (frmt (max-of-stones :black data))
     (frmt (max-of-total data)))
   (printf "%10s %20s %20s %20s\n" "min:"
-    (frmt (min-of-stones 'white data))
-    (frmt (min-of-stones 'black data))
+    (frmt (min-of-stones :white data))
+    (frmt (min-of-stones :black data))
     (frmt (min-of-total data)))
   (println))
 

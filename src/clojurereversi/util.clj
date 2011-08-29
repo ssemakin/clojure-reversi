@@ -15,8 +15,8 @@
           (do
             (cond
               (possible-moves [y x]) (print "*")
-              (= (board [y x]) 'black) (print "@")
-              (= (board [y x]) 'white) (print "0")
+              (= (board [y x]) :black) (print "@")
+              (= (board [y x]) :white) (print "0")
               :else (print "."))
             (recur (inc x)))
           (println)))

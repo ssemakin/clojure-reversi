@@ -17,20 +17,20 @@
 (defn pos-middle-down-left [size] [(+ (/ size 2) 1) (/ size 2)])
 (defn pos-middle-down-right [size] [(+ (/ size 2) 1) (+ (/ size 2) 1)])
 
-(defn black? [board pos] (= (board pos) 'black))
-(defn white? [board pos] (= (board pos) 'white))
+(defn black? [board pos] (= (board pos) :black))
+(defn white? [board pos] (= (board pos) :white))
 (defn empty-cell? [board pos] (nil? (board pos)))
 (defn cell-color? [color board pos] (= (board pos) color))
 
-(defn put-black [board position] (conj board {position 'black}))
-(defn put-white [board position] (conj board {position 'white}))
+(defn put-black [board position] (conj board {position :black}))
+(defn put-white [board position] (conj board {position :white}))
 (defn put-color [color board position] (conj board {position color}))
 (defn mput-color [color board positions]
   (if (first positions)
     (recur color (put-color color board (first positions)) (rest positions))
     board))
 
-(def rival-color {'black 'white, 'white 'black})
+(def rival-color {:black :white, :white :black})
 
 (defn positions [color board]
   (->> (filter #(= (% 1) color) board) (map #(% 0))))

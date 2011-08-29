@@ -6,8 +6,8 @@
   (:use [clojurereversi.stats :only (add-duration print-stats empty-stats)]))
 
 (defn print-score [board]
-  (let [whites (count (positions 'white board))
-        blacks (count (positions 'black board))]
+  (let [whites (count (positions :white board))
+        blacks (count (positions :black board))]
     (println)
     (print "white:" whites "black:" blacks "/")
     (cond
@@ -51,17 +51,17 @@
         (recur (play-color color pos board) (rival-color color) make-move nstats))))))
 
 (defn make-user-user-moves [color board]
-  (({'white user-input, 'black user-input} color) color board))
+  (({:white user-input, :black user-input} color) color board))
 
 (defn make-ai-user-moves [color board]
-  (({'white ai-input, 'black user-input} color) color board))
+  (({:white ai-input, :black user-input} color) color board))
 
 (defn make-user-ai-moves [color board]
-  (({'white user-input, 'black ai-input} color) color board))
+  (({:white user-input, :black ai-input} color) color board))
 
 (defn make-ai-ai-moves [color board]
-  (({'white ai-input, 'black ai-input} color) color board))
+  (({:white ai-input, :black ai-input} color) color board))
 
 
 ; Let's start...
-(console-ui (init-board 8) 'white make-ai-ai-moves empty-stats)
+(console-ui (init-board 8) :white make-ai-ai-moves empty-stats)
