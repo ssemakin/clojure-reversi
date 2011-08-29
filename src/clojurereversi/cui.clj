@@ -25,15 +25,21 @@
         (println "invalid move:" pos "," color "can go to:" valid-moves)
         (recur color board)))))
 
+(defn ai-input [color board]
+  (let [pos (ai-play color board)]
+    (println "$" color "goes to" pos)
+    pos))
+
 (defn console-ui [board color make-move stats]
   (let [all-moves (find-moves color board),
         all-moves-rival (find-moves (rival-color color) board)]
+    (println color "is thinking...")
     (print-board board all-moves)
     (cond
       (and (empty? all-moves) (empty? all-moves-rival))
         (do (print-score board) (print-stats stats) (println "Game over."))
       (empty? all-moves)
-        (do (println color "has no moves, passing over to" (rival-color color))
+        (do (println color "has no moves, passing over to" (rival-color color) "\n")
           (recur board (rival-color color) make-move stats))
       :else
       (do (let [start# (. System (nanoTime))
@@ -47,13 +53,13 @@
   (({'white user-input, 'black user-input} color) color board))
 
 (defn make-ai-user-moves [color board]
-  (({'white ai-play, 'black user-input} color) color board))
+  (({'white ai-input, 'black user-input} color) color board))
 
 (defn make-user-ai-moves [color board]
-  (({'white user-input, 'black ai-play} color) color board))
+  (({'white user-input, 'black ai-input} color) color board))
 
 (defn make-ai-ai-moves [color board]
-  (({'white ai-play, 'black ai-play} color) color board))
+  (({'white ai-input, 'black ai-input} color) color board))
 
 
 ; Let's start...

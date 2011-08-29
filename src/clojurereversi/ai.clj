@@ -25,8 +25,8 @@
         move-scores (->> (pmap #(hash-map % (- (minimax (rival-color color) (boards %) depth))) moves)
                       (vec) (reduce merge))
         best-score (find-best-score move-scores)]
-    (println "moves:" move-scores)
-    (println "best move:" best-score)
+    ;(println "moves:" move-scores)
+    ;(println "best move:" best-score)
     (first best-score)))
 
 
