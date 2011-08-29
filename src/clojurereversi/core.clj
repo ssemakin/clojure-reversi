@@ -24,16 +24,16 @@
 
 (defn put-black [board position] (conj board {position :black}))
 (defn put-white [board position] (conj board {position :white}))
-(defn put-color [color board position] (conj board {position color}))
+(defn put-stone [color board position] (conj board {position color}))
 (defn mput-color [color board positions]
-  (if (first positions)
-    (recur color (put-color color board (first positions)) (rest positions))
+  (if-let [pos (first positions)]
+    (recur color (put-stone color board pos) (rest positions))
     board))
 
 (def rival-color {:black :white, :white :black})
 
 (defn positions [color board]
-  (->> (filter #(= (% 1) color) board) (map #(% 0))))
+  (keep #(when (= (% 1) color) (% 0)) board))
 
 (defn valid-pos? [board pos]
   (and (> (pos 0) 0) (> (pos 1) 0)

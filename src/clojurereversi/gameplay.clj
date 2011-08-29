@@ -1,6 +1,6 @@
 (ns clojurereversi.gameplay
   (:use [clojurereversi.core
-         :only (valid-pos? empty-cell? cell-color? mput-color put-color rival-color positions directions)]))
+         :only (valid-pos? empty-cell? cell-color? mput-color put-stone rival-color positions directions)]))
 
 (defn end-of-game? [moves rival-moves]
   (and (empty? moves) (empty? rival-moves)))
@@ -20,9 +20,9 @@
 
 (defn find-moves [color board]
   (loop [poss (positions color board) moves #{}]
-    (if (first poss)
+    (if-let [pos (first poss)]
       (let [xs (->>
-                  (map #((find-move-in-dir % color (first poss) board) :covering-pos) directions)
+                  (map #((find-move-in-dir % color pos board) :covering-pos) directions)
                   (set)
                   (filter #(not-empty %)))]
         (recur (rest poss) (set (concat moves xs))))
@@ -46,4 +46,4 @@
       result-board)))
 
 (defn play-color [color pos board]
-  (do-adjacent-for-stone color pos (put-color color board pos)))
+  (do-adjacent-for-stone color pos (put-stone color board pos)))
