@@ -2,7 +2,8 @@
   (:use [clojurereversi.util :only (print-board)])
   (:use [clojurereversi.core :only (rival-color positions init-board)])
   (:use [clojurereversi.gameplay :only (find-moves play-color)])
-  (:use [clojurereversi.ai :only (ai-play)]))
+  (:use [clojurereversi.ai :only (ai-play)])
+  (:use [clojurereversi.stats :only (add-duration print-stats empty-stats)]))
 
 (defn print-score [board]
   (let [whites (count (positions 'white board))
@@ -24,20 +25,23 @@
         (println "invalid move:" pos "," color "can go to:" valid-moves)
         (recur color board)))))
 
-(defn console-ui [board color make-move]
+(defn console-ui [board color make-move stats]
   (let [all-moves (find-moves color board),
         all-moves-rival (find-moves (rival-color color) board)]
     (print-board board all-moves)
     (cond
       (and (empty? all-moves) (empty? all-moves-rival))
-        (do (print-score board)(println "Game over."))
+        (do (print-score board) (print-stats stats) (println "Game over."))
       (empty? all-moves)
         (do (println color "has no moves, passing over to" (rival-color color))
-          (recur board (rival-color color) make-move))
+          (recur board (rival-color color) make-move stats))
       :else
-      (do (let [pos (make-move color board)]
+      (do (let [start# (. System (nanoTime))
+                pos (make-move color board)
+                end# (. System (nanoTime))
+                nstats (add-duration color (double (- end# start#)) stats)]
         (println)
-        (recur (play-color color pos board) (rival-color color) make-move))))))
+        (recur (play-color color pos board) (rival-color color) make-move nstats))))))
 
 (defn make-user-user-moves [color board]
   (({'white user-input, 'black user-input} color) color board))
@@ -53,5 +57,4 @@
 
 
 ; Let's start...
-(console-ui (init-board 8) 'white make-user-ai-moves)
-
+(console-ui (init-board 8) 'white make-ai-ai-moves empty-stats)
