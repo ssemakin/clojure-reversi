@@ -11,7 +11,7 @@
       (cond
         (= (board next-pos) capture-color)
           (recur next-pos (conj captured {:captured (concat (captured :captured) [next-pos])}))
-        (and (needed-state? board next-pos) (valid-pos? board next-pos) (= (board s) capture-color))
+        (and (needed-state? board next-pos) (= (board s) capture-color) (valid-pos? board next-pos))
           (conj captured {:covering-pos next-pos})
         :else {}))))
 
