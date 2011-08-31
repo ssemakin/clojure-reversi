@@ -32,5 +32,5 @@
 
 (defn ai-play [color board]
   (ai-find-best-move color board 3))
-  ;(ai-find-best-move color board 9))
+;  (ai-find-best-move color board 9))
 

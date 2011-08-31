@@ -1,4 +1,21 @@
 
+31 August 2011
+==============
+
+pmap is used in ai-find-best-move, minimax depth = 3, board: 8 x 8
+
+In find-state-in-dir function an option added to to either collect captured
+stones or skip them. Helped to improve time. (Total duration for the
+previous tests mentioned below was roughly 50-55 seconds)
+
+white: 0 black: 55 / black wins.
+
+total duration of the game: 43.343 secs
+time per one move:
+                 [white stones]       [black stones]         [all stones]
+  average:         774.42 msecs         922.40 msecs         849.86 msecs
+      max:           2.644 secs           3.509 secs           3.509 secs
+      min:          14.13 msecs           1.87 msecs           1.87 msecs
 
 
 29 Aug 2011
