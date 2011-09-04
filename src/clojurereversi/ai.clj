@@ -1,5 +1,5 @@
 (ns clojurereversi.ai
-  (:use [clojurereversi.core :only (positions rival-color)])
+  (:use [clojurereversi.board :only (positions rival-color)])
   (:use [clojurereversi.gameplay :only (find-moves play-color end-of-game?)]))
 
 (defn evaluate-game [color board]

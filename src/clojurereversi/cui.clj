@@ -1,6 +1,6 @@
 (ns clojurereversi.cui
   (:use [clojurereversi.util :only (print-board)])
-  (:use [clojurereversi.core :only (rival-color positions init-board)])
+  (:use [clojurereversi.board :only (rival-color positions init-board)])
   (:use [clojurereversi.gameplay :only (find-moves play-color)])
   (:use [clojurereversi.ai :only (ai-play)])
   (:use [clojurereversi.stats :only (add-duration print-stats empty-stats)]))

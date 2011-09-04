@@ -1,4 +1,4 @@
-(ns clojurereversi.core)
+(ns clojurereversi.board)
 
 ;(defn north-dir [pos] [(dec (pos 0)) (pos 1)])
 ;(defn north-east-dir [pos] [(dec (pos 0)) (inc (pos 1))])

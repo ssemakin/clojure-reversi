@@ -1,5 +1,5 @@
 (ns clojurereversi.gameplay
-  (:use [clojurereversi.core
+  (:use [clojurereversi.board
          :only (valid-pos? empty-cell? cell-color? mput-color put-stone rival-color positions directions)]))
 
 (defn end-of-game? [moves rival-moves]
