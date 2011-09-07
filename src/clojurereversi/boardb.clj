@@ -31,4 +31,7 @@
         args (gen-board-type-args size)]
     `(defrecord ~name ~args)))
 
+(defmacro new-obj [o-type & ctr-values]
+  `(new ~(eval o-type) ~@ctr-values))
+
 (defn empty-board [size])
