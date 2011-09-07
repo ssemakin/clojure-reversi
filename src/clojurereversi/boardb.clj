@@ -16,6 +16,16 @@
 (defrecord NorthEastSector [n ne e])
 (defrecord EastSector [n ne e se s])
 
+(defn init-neighbours
+  ([{n :n ne :ne e :e se :se s :s sw :sw w :w nw :nw}]
+    (cond
+      (and n ne e se s sw w nw) (println "all are in plce")
+      (and e se s (not (or n ne sw w nw))) (println "detected: e se s")
+      :else (println "something is wrong")
+      )
+    )
+  )
+
 (defn gen-board-type-cells [size]
   (def nums (range 1 (inc size)))
   (vec (for [r nums c nums] (gen-cell-name r c))))
@@ -35,3 +45,4 @@
   `(new ~(eval o-type) ~@ctr-values))
 
 (defn empty-board [size])
+
