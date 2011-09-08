@@ -16,6 +16,13 @@
 (defrecord NorthEastSector [n ne e])
 (defrecord EastSector [n ne e se s])
 
+(defn direction-type? [t & d]
+  (def full360 #{"n" "ne" "e" "se" "s" "sw" "w" "nw"})
+  (let [directions (set (map #(name %) (filter #(true? %) d)))
+        t-fields (set (map #(:name (bean %)) (seq (:fields (bean t)))))
+        t-directions (clojure.set/intersection t-fields full360)]
+    (= directions t-directions)))
+
 (defn init-neighbours
   ([{n :n ne :ne e :e se :se s :s sw :sw w :w nw :nw}]
     (cond
