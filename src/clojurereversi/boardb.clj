@@ -1,37 +1,48 @@
-(ns clojurereversi.boardb)
-
-;(defn gen-cell-name [row column]
-;  (. clojure.lang.Symbol (intern (str "c" row column))))
-(defn gen-cell-name [row column] (symbol (str "c" row column)))
+(ns clojurereversi.boardb
+  (:use [clojurereversi.util]))
 
 (defrecord Cell [color neighbours])
 
-(defrecord WindRose [n ne e se s sw w nw])
-(defrecord SouthEastSector [e se s])
-(defrecord SouthSector [e se s sw w])
-(defrecord SouthWestSector [s sw w])
-(defrecord WestSector [n s sw w nw])
-(defrecord NorthWestSector [n w nw])
-(defrecord NorthSector [n ne e w nw])
-(defrecord NorthEastSector [n ne e])
-(defrecord EastSector [n ne e se s])
+(defrecord FullSector360 [n ne e se s sw w nw])
+(defrecord SouthEastSector45 [e se s])
+(defrecord SouthSector180 [e se s sw w])
+(defrecord SouthWestSector45 [s sw w])
+(defrecord WestSector180 [n s sw w nw])
+(defrecord NorthWestSector45 [n w nw])
+(defrecord NorthSector180 [n ne e w nw])
+(defrecord NorthEastSector45 [n ne e])
+(defrecord EastSector180 [n ne e se s])
 
-(defn direction-type? [t & d]
+(defn direction-type? [t d]
   (def full360 #{"n" "ne" "e" "se" "s" "sw" "w" "nw"})
-  (let [directions (set (map #(name %) (filter #(true? %) d)))
+  (let [directions (set (keep #(when (val %) (name (key %))) d))
         t-fields (set (map #(:name (bean %)) (seq (:fields (bean t)))))
         t-directions (clojure.set/intersection t-fields full360)]
     (= directions t-directions)))
 
-(defn init-neighbours
-  ([{n :n ne :ne e :e se :se s :s sw :sw w :w nw :nw}]
+(defn build-sector
+  ([d]
     (cond
-      (and n ne e se s sw w nw) (println "all are in plce")
-      (and e se s (not (or n ne sw w nw))) (println "detected: e se s")
-      :else (println "something is wrong")
-      )
-    )
-  )
+      (direction-type? FullSector360 d) (FullSector360. (:n d) (:ne d) (:e d) (:se d) (:s d) (:sw d) (:w d) (:nw d))
+      (direction-type? SouthEastSector45 d) (SouthEastSector45. (:e d) (:se d) (:s d))
+      (direction-type? SouthSector180 d) (SouthSector180. (:e d) (:se d) (:s d) (:sw d) (:w d))
+      (direction-type? SouthWestSector45 d) (SouthWestSector45. (:s d) (:sw d) (:w d))
+      (direction-type? WestSector180 d) (WestSector180. (:n d) (:s d) (:sw d) (:w d) (:nw d))
+      (direction-type? NorthWestSector45 d) (NorthWestSector45. (:n d) (:w d) (:nw d))
+      (direction-type? NorthSector180 d) (NorthSector180. (:n d) (:ne d) (:e d) (:w d) (:nw d))
+      (direction-type? NorthEastSector45 d) (NorthEastSector45. (:n d) (:ne d) (:e d))
+      (direction-type? EastSector180 d) (EastSector180. (:n d) (:ne d) (:e d) (:se d) (:s d))
+      :else (throw (new Exception (str "Unknown direction type!! " d))))))
+
+(def dirs {:n north-dir :ne north-east-dir :e east-dir :se south-east-dir
+           :s south-dir :sw south-west-dir :w west-dir :nw north-west-dir})
+
+(defn find-neighbours [size [r c]]
+  (reduce merge (keep #(when (valid-pos? size ((val %) [r c])) {(key %) ((val %) [r c])}) dirs)))
+
+;(defn gen-cell-name [row column]
+;  (. clojure.lang.Symbol (intern (str "c" row column))))
+(defn gen-cell-name [row column] (symbol (str "c" row column)))
 
 (defn gen-board-type-cells [size]
   (def nums (range 1 (inc size)))

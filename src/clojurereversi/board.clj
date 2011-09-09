@@ -1,33 +1,5 @@
-(ns clojurereversi.board)
-
-;(defn north-dir [pos] [(dec (pos 0)) (pos 1)])
-;(defn north-east-dir [pos] [(dec (pos 0)) (inc (pos 1))])
-;(defn east-dir [pos] [(pos 0) (inc (pos 1))])
-;(defn south-east-dir [pos] [(inc (pos 0)) (inc (pos 1))])
-;(defn south-dir [pos] [(inc (pos 0)) (pos 1)])
-;(defn south-west-dir [pos] [(inc (pos 0)) (dec (pos 1))])
-;(defn west-dir [pos] [(pos 0) (dec (pos 1))])
-;(defn north-west-dir [pos] [(dec (pos 0)) (dec (pos 1))])
-
-;(defn north-dir [pos] [(dec (first pos)) (pos 1)])
-;(defn north-east-dir [pos] [(dec (first pos)) (inc (pos 1))])
-;(defn east-dir [pos] [(first pos) (inc (pos 1))])
-;(defn south-east-dir [pos] [(inc (first pos)) (inc (pos 1))])
-;(defn south-dir [pos] [(inc (first pos)) (pos 1)])
-;(defn south-west-dir [pos] [(inc (first pos)) (dec (pos 1))])
-;(defn west-dir [pos] [(first pos) (dec (pos 1))])
-;(defn north-west-dir [pos] [(dec (first pos)) (dec (pos 1))])
-
-
-(defn north-dir [[r c]] [(dec r) c])
-(defn north-east-dir [[r c]] [(dec r) (inc c)])
-(defn east-dir [[r c]] [r (inc c)])
-(defn south-east-dir [[r c]] [(inc r) (inc c)])
-(defn south-dir [[r c]] [(inc r) c])
-(defn south-west-dir [[r c]] [(inc r) (dec c)])
-(defn west-dir [[r c]] [r (dec c)])
-(defn north-west-dir [[r c]] [(dec r) (dec c)])
-
+(ns clojurereversi.board
+  (:use [clojurereversi.util]))
 
 (def directions [north-dir north-east-dir east-dir south-east-dir
                  south-dir south-west-dir west-dir north-west-dir])
@@ -67,22 +39,6 @@
 (defmacro positions [color board]
   `(keep (fn [[pos# stone#]] (when (= stone# ~color) pos#)) ~board))
 
-
-;(defn valid-pos? [board pos]
-;  (and (> (pos 0) 0) (> (pos 1) 0)
-;    (<= (pos 0) (board :size)) (<= (pos 1) (board :size))))
-
-;(defn valid-pos? [board [row column]]
-;  (let [sz (:size board)]
-;    (and (> row 0) (> column 0) (<= row sz) (<= column sz))))
-
-;(defn valid-pos? [{sz :size} [row column]]
-;    (and (> row 0) (> column 0) (<= row sz) (<= column sz)))
-
-(defmacro valid-pos? [board pos]
-  `(let [{sz# :size} ~board [row# column#] ~pos]
-    (and (> row# 0) (> column# 0) (<= row# sz#) (<= column# sz#))))
-
 (defn empty-board [size] (hash-map :size size))
 
 (defn init-board [size]
@@ -90,5 +46,4 @@
     (put-white (pos-middle-up-left size))
     (put-black (pos-middle-up-right size))
     (put-black (pos-middle-down-left size))
-    (put-white (pos-middle-down-right size)))
-  )
+    (put-white (pos-middle-down-right size))))
