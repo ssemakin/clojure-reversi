@@ -18,3 +18,9 @@
 
 (def nbrs (find-neighbours 3 [1 1]))
 (println "neighbours for [1 1]:" nbrs "-->" (build-sector nbrs))
+;(println (assoc (build-sector nbrs) :e 1))
+
+(println (init-board-args 2))
+
+(println (macroexpand-1 '(new-obj (gen-board-type 2) (init-board-args 2))))
+(println (new-obj (gen-board-type 2) (init-board-args 2)))

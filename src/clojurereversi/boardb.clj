@@ -48,11 +48,18 @@
   (def nums (range 1 (inc size)))
   (vec (for [r nums c nums] (gen-cell-name r c))))
 
+(defn init-board-cells [size]
+  (def nums (range 1 (inc size)))
+  (vec (for [r nums c nums]
+         (Cell. nil (build-sector (find-neighbours size [r c]))))))
+
 (defn gen-board-type-args [size]
   (-> (gen-board-type-cells size)
-    (conj 'white-stones)
-    (conj 'black-stones)
-    (conj 'size)))
+    (conj 'white-stones) (conj 'black-stones) (conj 'size)))
+
+(defn init-board-args [size]
+  (-> (init-board-cells size)
+    (conj #{}) (conj #{}) (conj size)))
 
 (defmacro gen-board-type [size]
   (let [name 'Board
@@ -60,7 +67,10 @@
     `(defrecord ~name ~args)))
 
 (defmacro new-obj [o-type & ctr-values]
-  `(new ~(eval o-type) ~@ctr-values))
+  `(new ~(eval o-type) ~@(flatten (eval (vec ctr-values)))))
+
+;(defn change-color [board [r c] color]
+;  (assoc board (gen-cell-name r c)
+;    (Cell. color )))
 
 (defn empty-board [size])
-
