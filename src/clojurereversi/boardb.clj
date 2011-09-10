@@ -69,6 +69,14 @@
 (defmacro new-obj [o-type & ctr-values]
   `(new ~(eval o-type) ~@(flatten (eval (vec ctr-values)))))
 
+(defn make-board [size]
+  (let [board-args (init-board-args size);(zipmap (gen-board-type-cells size) (init-board-cells size)))
+      board (new-obj (gen-board-type 2) (vec (repeat (count board-args) 0)))]
+  )
+;  (new-obj (gen-board-type 2) (vec (repeat (count board-args) 0)))
+;  (reduce #(assoc %1 (key %2) (val %2)) board board-args)
+  )
+
 ;(defn change-color [board [r c] color]
 ;  (assoc board (gen-cell-name r c)
 ;    (Cell. color )))

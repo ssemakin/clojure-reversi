@@ -24,3 +24,5 @@
 
 (println (macroexpand-1 '(new-obj (gen-board-type 2) (init-board-args 2))))
 (println (new-obj (gen-board-type 2) (init-board-args 2)))
+
+(println (make-board 2))
