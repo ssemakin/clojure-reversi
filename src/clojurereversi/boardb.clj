@@ -40,11 +40,12 @@
 (defn find-neighbours [size [r c]]
   (reduce merge (keep #(when (valid-pos? size ((val %) [r c])) {(key %) ((val %) [r c])}) dirs)))
 
-(defn gen-cell-name [row column] (symbol (str "c" row column)))
+(defn gen-cell-name-sym [[row column]] (symbol (str "c" row column)))
+(defn gen-cell-name-key [[row column]] (keyword (str "c" row column)))
 
 (defn gen-board-type-cells [size]
   (def nums (range 1 (inc size)))
-  (vec (for [r nums c nums] (gen-cell-name r c))))
+  (vec (for [r nums c nums] (gen-cell-name-sym [r c]))))
 
 (defmacro init-board-cells [size]
   (def nums (range 1 (inc size)))
@@ -69,6 +70,10 @@
   (def board-args (macroexpand-1 `(init-board-args ~size)))
   (eval (macroexpand-1 `(new ~board-type ~@board-args))))
 
-;(defn change-color [board [r c] color]
-;  (assoc board (gen-cell-name r c)
-;    (Cell. color )))
+(defn put-stone [color board position]
+  (def cell (gen-cell-name-key position))
+  (assoc board cell (Cell. color (:neighbours (cell board)))))
+
+(defn put-white [board position] (put-stone :white board position))
+(defn put-black [board position] (put-stone :black board position))
+

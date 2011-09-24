@@ -47,3 +47,4 @@
     (put-black (pos-middle-up-right size))
     (put-black (pos-middle-down-left size))
     (put-white (pos-middle-down-right size))))
+
