@@ -74,6 +74,11 @@
   (def cell (gen-cell-name-key position))
   (assoc board cell (Cell. color (:neighbours (cell board)))))
 
-(defn put-white [board position] (put-stone :white board position))
-(defn put-black [board position] (put-stone :black board position))
+(defn put-white-stone [board position] (put-stone :white board position))
+(defn put-black-stone [board position] (put-stone :black board position))
 
+(defn stone-color [board position] (:color ((gen-cell-name-key position) board)))
+(defn empty-cell? [board position] (nil? (stone-color board position)))
+(defn cell-stone-color? [color board position] (= color (stone-color board position)))
+(defn black-stone? [board position] (cell-stone-color? :black board position))
+(defn white-stone? [board position] (cell-stone-color? :white board position))

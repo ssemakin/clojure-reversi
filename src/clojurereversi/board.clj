@@ -28,7 +28,6 @@
     (recur color (put-stone color board pos) (rest positions))
     board))
 
-(def rival-color {:black :white, :white :black})
 
 ;(defn positions [color board]
 ;  (keep #(when (= (% 1) color) (% 0)) board))
