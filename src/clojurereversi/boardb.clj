@@ -1,5 +1,6 @@
 (ns clojurereversi.boardb
-  (:use [clojurereversi.util]))
+  (:use [clojurereversi.util])
+  (:use [clojure.set]))
 
 (defrecord Cell [color neighbours])
 

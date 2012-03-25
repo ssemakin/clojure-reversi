@@ -1,4 +1,5 @@
 (defproject clojure-reversi "1.0.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :dependencies [[org.clojure/clojure "1.2.1"]])
+  :description "A test project: simple implementation of the Reversi game."
+  :main clojurereversi.main
+  :dependencies [[org.clojure/clojure "1.3.0"]])
 
